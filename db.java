@@ -15,6 +15,7 @@ import java.io.IOException;
 @CommandLine.Command(name = "db", mixinStandardHelpOptions = true,
         description = "mansys db mode")
 public class db {
+
     @CommandLine.Command(name = "list", description = "get db list")
     public void listDB() throws IOException {
         FileTK.check(Definition.DB_PATH);

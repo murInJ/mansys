@@ -13,6 +13,7 @@ import java.io.IOException;
 @CommandLine.Command(name = "mansys", mixinStandardHelpOptions = true, version = "mansys alpha-0.0.0",
         description = "a light manage sqlite system",subcommands = {
         db.class,
+        table.class,
 })
 public class mansys {
     public static void main(String... args) {
