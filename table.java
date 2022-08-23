@@ -2,9 +2,11 @@ import DB.SQLite.SQLiteTK;
 import DB.SQLite.column.DBcolumn;
 import DB.SQLite.column.columnDefinition.columnDefinition;
 import DB.SQLite.column.columnType.columnType;
+import IO.FileTK;
 import picocli.CommandLine;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @title: table
@@ -22,10 +24,19 @@ public class table {
     }
 
     @CommandLine.Command(name = "create", description = "create a table")
-    public void createTable(@CommandLine.Option(names = "-n",required = true) String name) throws IOException, SQLException, ClassNotFoundException {
+    public void createTable(@CommandLine.Option(names = "-n",required = true) String name,
+                            @CommandLine.Option(names = "--sql") String sqlPath) throws IOException, SQLException, ClassNotFoundException {
         String dbFile_path = Definition.DB_PATH + "\\" + mansys.workplace.db + ".db";
         SQLiteTK sqlDB = new SQLiteTK(dbFile_path,true);
-        sqlDB.CreateTable(name);
+
+        if(sqlPath != null){
+            String sql = FileTK.readFile(sqlPath);
+            sqlDB.executeUpdate(sql);
+        }
+        else{
+            sqlDB.CreateTable(name);
+        }
+
     }
 
     @CommandLine.Command(name = "addCol", description = "add column")
@@ -60,5 +71,42 @@ public class table {
         String dbFile_path = Definition.DB_PATH + "\\" + mansys.workplace.db + ".db";
         SQLiteTK sqlDB = new SQLiteTK(dbFile_path,true);
         sqlDB.Delete(mansys.workplace.tb,condition);
+    }
+
+    @CommandLine.Command(name = "query",description = "select data")
+    public void query(
+            @CommandLine.Parameters(description = "column") String column,
+            @CommandLine.Option(description = "condition",names = "-c") String condition) throws SQLException, IOException, ClassNotFoundException {
+        String dbFile_path = Definition.DB_PATH + "\\" + mansys.workplace.db + ".db";
+        SQLiteTK sqlDB = new SQLiteTK(dbFile_path,true);
+        List<Object> res;
+        if(condition == null){
+            res = sqlDB.Query(mansys.workplace.tb,column);
+        }else{
+            res = sqlDB.Query(mansys.workplace.tb,column,condition);
+        }
+        for(Object o : res){
+            System.out.println(o);
+        }
+    }
+
+   @CommandLine.Command(name = "columns",description = "show columns name")
+    public void columns() throws SQLException, IOException, ClassNotFoundException {
+       String dbFile_path = Definition.DB_PATH + "\\" + mansys.workplace.db + ".db";
+       SQLiteTK sqlDB = new SQLiteTK(dbFile_path,true);
+       List<Object> res = sqlDB.getColumnsName(mansys.workplace.tb);
+       for(Object o : res){
+           System.out.printf("- %s\n",o);
+       }
+   }
+
+    @CommandLine.Command(name = "list",description = "list tables")
+    public void listTables() throws SQLException, IOException, ClassNotFoundException {
+        String dbFile_path = Definition.DB_PATH + "\\" + mansys.workplace.db + ".db";
+        SQLiteTK sqlDB = new SQLiteTK(dbFile_path,true);
+        List<Object> res = sqlDB.TablesList();
+        for(Object o : res){
+            System.out.printf("- %s\n",o);
+        }
     }
 }
