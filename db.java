@@ -1,6 +1,7 @@
+import DB.SQLite.SQLiteTK;
+import IO.FileTK;
 import picocli.CommandLine;
-import src.main.java.DB.SQLite.SQLiteTK;
-import src.main.java.FileTK;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,10 @@ import java.io.IOException;
 @CommandLine.Command(name = "db", mixinStandardHelpOptions = true,
         description = "mansys db mode")
 public class db {
+    @CommandLine.Command(name = "use",description = "use db")
+    public void use(@CommandLine.Parameters(description = "db name") String dbName){
+        mansys.workplace.db = dbName;
+    }
 
     @CommandLine.Command(name = "list", description = "get db list")
     public void listDB() throws IOException {
@@ -27,7 +32,7 @@ public class db {
     }
 
     @CommandLine.Command(name = "create", description = "create a db")
-    public void createDB(@CommandLine.Option(names = "-n") String name) throws IOException {
+    public void createDB(@CommandLine.Option(names = "-n",required = true) String name) throws IOException {
         SQLiteTK.CreateDB(Definition.DB_PATH,name);
     }
 }
